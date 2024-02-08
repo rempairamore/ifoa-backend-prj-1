@@ -113,7 +113,7 @@ if ($_REQUEST["mode"] === 'newBook') {
 
     $bookTitle = strlen(trim(htmlspecialchars($_REQUEST['bookTitle']))) > 2 ? trim(htmlspecialchars($_REQUEST['bookTitle'])) : exit("Booktitle no buono");
     $authorName = strlen(trim(htmlspecialchars($_REQUEST['authorName']))) > 2 ? trim(htmlspecialchars($_REQUEST['authorName'])) : exit("Autore nome no buono");
-    $year = (is_numeric($_REQUEST['year']) && strlen(trim($_REQUEST['year'])) == 4) ? trim($_REQUEST['year']) : exit("Anno no buono");
+    $year = (is_numeric($_REQUEST['year']) && strlen(trim($_REQUEST['year'])) > 0) ? trim($_REQUEST['year']) : exit("Anno no buono");
     $imageLink = !empty(trim($_REQUEST['imageLink'])) && filter_var(trim($_REQUEST['imageLink']), FILTER_VALIDATE_URL) ? trim($_REQUEST['imageLink']) : "assets/uploads/book.png";
 
 
@@ -154,21 +154,39 @@ if ($_REQUEST["mode"] === 'newBook') {
             $id_autore_grep = $my_db->query("SELECT * FROM autori WHERE nome like '%" . $_REQUEST['authorName'] . "%';")->fetch_assoc()["id"];
             $genreId = getGenreId($_REQUEST['genre']);
             
-            $inserisci_libro = "INSERT INTO libri (isbn, titolo, anno_pub, id_autore, id_genere, img_src) VALUES 
+            $inserisci_libro = "INSERT INTO libri (isbn, titolo, anno_pub, id_autore, id_genere, img_src, created_by_user_id ) VALUES 
                                     (" . $_REQUEST['isbn'] . ", '" . $_REQUEST['bookTitle']  
-                                    . "', " . $_REQUEST['year'] . ", " . $id_autore_grep . ", " . $genreId . ", '" . $_REQUEST['imageLink'] . "');" ;
+                                    . "', " . $_REQUEST['year'] . ", " . $id_autore_grep . ", " . $genreId . ", '" . $_REQUEST['imageLink'] . "', " . $_SESSION["user_id"] . ");" ;
             
-            print_r($inserisci_libro);
+            // print_r($inserisci_libro);
             $my_db->query($inserisci_libro);
             header('Location: books.php');
             exit();
             
         } else {
             echo "L'autore esiste";
+            $id_autore_grep = $result2[0]['id'];
+            $genreId = getGenreId($_REQUEST['genre']);
+
+            $inserisci_libro = "INSERT INTO libri (isbn, titolo, anno_pub, id_autore, id_genere, img_src, created_by_user_id) VALUES 
+                                    (" . $_REQUEST['isbn'] . ", '" . $_REQUEST['bookTitle']  
+                                    . "', " . $_REQUEST['year'] . ", " . $id_autore_grep . ", " . $genreId . ", '" . $_REQUEST['imageLink'] . "', " . $_SESSION["user_id"] . ");" ;
+
+              
+
+            $my_db->query($inserisci_libro);
+
+            header('Location: books.php');
+            exit();
+
+
         }
 
     } else {
         echo "ISBN già presente";
+        header('Location: addbook.php?isbnExist=true');
+        exit();
+            
     }
 
 };

@@ -5,7 +5,7 @@
   if ($_SESSION['login'] === 'true') {
     // Leggo dati da una tabella
   
-    $sql = 'SELECT isbn,titolo,anno_pub,img_src,autori.nome,generi.genere FROM libri INNER JOIN autori ON libri.id_autore = autori.id JOIN generi ON libri.id_genere = generi.id;';
+    $sql = 'SELECT libri.isbn, libri.titolo, libri.anno_pub, libri.img_src, libri.created_by_user_id, autori.nome, generi.genere FROM libri INNER JOIN autori ON libri.id_autore = autori.id JOIN generi ON libri.id_genere = generi.id WHERE libri.created_by_user_id = ' . $_SESSION["user_id"];
     $result = [];
     $res = $my_db->query($sql); // return un mysqli result
     if ($res) { // Controllo se ci sono dei dati nella variabile $res

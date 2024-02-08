@@ -4,6 +4,12 @@ require_once("assets/php/config.php") ?>
 
 
 <h2 class="m-4 text-center">Book Form</h2>
+<?php
+if($_REQUEST['isbnExist'] === 'true') {
+    ?>
+    <h4 class="m-4 text-warning text-center">ISBN already in the system, must be UNIQUE!</h4> <?php
+}?>
+
 <div class="container d-flex justify-content-center mt-5">
     <form class="w-50" method="POST" action="controller.php?mode=newBook">
         <div class="mb-3">

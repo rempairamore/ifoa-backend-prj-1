@@ -35,7 +35,7 @@ session_start();
             Manage
           </a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="/books.php">Show Books</a></li>
+            <li><a class="dropdown-item" href="/books.php">Your Books</a></li>
             <li><a class="dropdown-item" href="/addbook.php">Add Book</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="#">My Profile</a></li>
