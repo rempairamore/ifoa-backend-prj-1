@@ -29,3 +29,5 @@ Temporary Items
 *.tmp
 *.swp
 *.swo
+
+assets/uploads/*

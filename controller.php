@@ -17,19 +17,17 @@ if ($_REQUEST["mode"] === 'new') {
     $pass = $matchesPass ? htmlspecialchars($_REQUEST['password']) : exit();
     $password = password_hash($pass, PASSWORD_DEFAULT);
 
-    // $target_dir = "http://" . $_SERVER['SERVER_NAME'] . $percorso . '/assets/uploads/';
-    // $tutta_dir = $target_dir . "default.png";
 
 
     if ($_FILES['fotoFile']['size'] < 1) {
-        $target_dir = "http://" . $_SERVER['SERVER_NAME'] . $percorso . '/assets/uploads/';
+        $target_dir = "http://" . $_SERVER['SERVER_NAME'] . $percorso . '/assets/img/';
         $tutta_dir = $target_dir . "default.png";
-        
+
     } else {
         if ($_FILES['fotoFile']['type'] === 'image/jpeg' || $_FILES['fotoFile']['type'] === 'image/png') {
             //    print_r($_FILES['fotoFile']);
             $file_name = $_FILES['fotoFile']['name'];
-            $senza_spazi = str_replace(' ', '', $file_name);
+            $senza_spazi = preg_replace('/[^A-Za-z0-9.\-_]+/', '', $file_name);
 
             $target_dir = "http://" . $_SERVER['SERVER_NAME'] . $percorso . '/assets/uploads/';
             $tutta_dir = $target_dir . $senza_spazi;
@@ -168,27 +166,27 @@ if ($_REQUEST["mode"] === 'newBook') {
             $my_db->query($insert_autore);
             $id_autore_grep = $my_db->query("SELECT * FROM autori WHERE nome like '%" . $_REQUEST['authorName'] . "%';")->fetch_assoc()["id"];
             $genreId = getGenreId($_REQUEST['genre']);
-            
+
             $inserisci_libro = "INSERT INTO libri (isbn, titolo, anno_pub, id_autore, id_genere, img_src, created_by_user_id ) VALUES 
-                                    (" . $_REQUEST['isbn'] . ", '" . $_REQUEST['bookTitle']  
-                                    . "', " . $_REQUEST['year'] . ", " . $id_autore_grep . ", " . $genreId . ", '" . $_REQUEST['imageLink'] . "', " . $_SESSION["user_id"] . ");" ;
-            
+                                    (" . $_REQUEST['isbn'] . ", '" . $_REQUEST['bookTitle']
+                . "', " . $_REQUEST['year'] . ", " . $id_autore_grep . ", " . $genreId . ", '" . $_REQUEST['imageLink'] . "', " . $_SESSION["user_id"] . ");";
+
             // print_r($inserisci_libro);
             $my_db->query($inserisci_libro);
             session_write_close();
             header('Location: books.php');
             exit();
-            
+
         } else {
             echo "L'autore esiste";
             $id_autore_grep = $result2[0]['id'];
             $genreId = getGenreId($_REQUEST['genre']);
 
             $inserisci_libro = "INSERT INTO libri (isbn, titolo, anno_pub, id_autore, id_genere, img_src, created_by_user_id) VALUES 
-                                    (" . $_REQUEST['isbn'] . ", '" . $_REQUEST['bookTitle']  
-                                    . "', " . $_REQUEST['year'] . ", " . $id_autore_grep . ", " . $genreId . ", '" . $_REQUEST['imageLink'] . "', " . $_SESSION["user_id"] . ");" ;
+                                    (" . $_REQUEST['isbn'] . ", '" . $_REQUEST['bookTitle']
+                . "', " . $_REQUEST['year'] . ", " . $id_autore_grep . ", " . $genreId . ", '" . $_REQUEST['imageLink'] . "', " . $_SESSION["user_id"] . ");";
 
-              
+
 
             $my_db->query($inserisci_libro);
 
@@ -204,10 +202,11 @@ if ($_REQUEST["mode"] === 'newBook') {
         session_write_close();
         header('Location: addbook.php?isbnExist=true');
         exit();
-            
+
     }
 
-};
+}
+;
 
 if (!empty($_REQUEST["isbn"])) {
     // echo "non è vuota";
@@ -219,9 +218,11 @@ if (!empty($_REQUEST["isbn"])) {
         session_write_close();
         header('Location: books.php');
         exit();
-        
-    };
-};
+
+    }
+    ;
+}
+;
 
 
 // implementare ricerca sul sito
@@ -243,74 +244,113 @@ if ($_REQUEST["mode"] === 'editBook') {
     $query_di_edit = '';
 
     $check_autore = "SELECT * FROM autori WHERE nome like '%" . $_REQUEST['authorName'] . "%';";
-        // print_r($check_autore);
-        $result2 = [];
-        $res2 = $my_db->query($check_autore); // return un mysqli result
-        if ($res2) { // Controllo se ci sono dei dati nella variabile $res
-            //var_dump($res);
-            while ($row = $res2->fetch_assoc()) { // Trasformo $res in un array associativo
-                // $result[] = $row; // estraggo ogni singola riga che leggo dal DB e la inserisco in un array
-                array_push($result2, $row); // estraggo ogni singola riga che leggo dal DB e la inserisco in un array
-            }
+    // print_r($check_autore);
+    $result2 = [];
+    $res2 = $my_db->query($check_autore); // return un mysqli result
+    if ($res2) { // Controllo se ci sono dei dati nella variabile $res
+        //var_dump($res);
+        while ($row = $res2->fetch_assoc()) { // Trasformo $res in un array associativo
+            // $result[] = $row; // estraggo ogni singola riga che leggo dal DB e la inserisco in un array
+            array_push($result2, $row); // estraggo ogni singola riga che leggo dal DB e la inserisco in un array
         }
+    }
 
-        
-        if (empty($result2)) {
-            echo "L'autore non esiste";
-            $insert_autore = "INSERT INTO autori (nome) VALUES ('" . $_REQUEST['authorName'] . "');";
-            // print_r($insert_autore);
-            $my_db->query($insert_autore);
-            $id_autore_grep = $my_db->query("SELECT * FROM autori WHERE nome like '%" . $_REQUEST['authorName'] . "%';")->fetch_assoc()["id"];
-            $genreId = getGenreId($_REQUEST['genre']);
-            $isbnToBeEdited = mysqli_real_escape_string($my_db, $_SESSION['isbnToBeEdited']);
-            
-            $edita_libro = "UPDATE libri SET  
+
+    if (empty($result2)) {
+        echo "L'autore non esiste";
+        $insert_autore = "INSERT INTO autori (nome) VALUES ('" . $_REQUEST['authorName'] . "');";
+        // print_r($insert_autore);
+        $my_db->query($insert_autore);
+        $id_autore_grep = $my_db->query("SELECT * FROM autori WHERE nome like '%" . $_REQUEST['authorName'] . "%';")->fetch_assoc()["id"];
+        $genreId = getGenreId($_REQUEST['genre']);
+        $isbnToBeEdited = mysqli_real_escape_string($my_db, $_SESSION['isbnToBeEdited']);
+
+        $edita_libro = "UPDATE libri SET  
             titolo = '" . $_REQUEST['bookTitle'] . "', 
             anno_pub = " . $_REQUEST['year'] . ", 
             id_autore = " . $id_autore_grep . ", 
             id_genere = " . $genreId . ", 
             img_src = '" . $_REQUEST['imageLink'] . "'
             WHERE isbn = '" . $isbnToBeEdited . "';";
-            // print_r($inserisci_libro);
-            $my_db->query($edita_libro);
-            session_write_close();
-            header('Location: books.php');
-            exit();
-            
-        } else {
-            echo "L'autore esiste";
-            $id_autore_grep = $result2[0]['id'];
-            $genreId = getGenreId($_REQUEST['genre']);
-            
-            $isbnToBeEdited = $_SESSION['isbnToBeEdited'];
-            
-            // Preparazione della query di aggiornamento per il libro esistente
-            $edita_libro = "UPDATE libri SET  
+        // print_r($inserisci_libro);
+        $my_db->query($edita_libro);
+        session_write_close();
+        header('Location: books.php');
+        exit();
+
+    } else {
+        echo "L'autore esiste";
+        $id_autore_grep = $result2[0]['id'];
+        $genreId = getGenreId($_REQUEST['genre']);
+
+        $isbnToBeEdited = $_SESSION['isbnToBeEdited'];
+
+        // Preparazione della query di aggiornamento per il libro esistente
+        $edita_libro = "UPDATE libri SET  
                             titolo = '" . $_REQUEST['bookTitle'] . "', 
                             anno_pub = " . $_REQUEST['year'] . ", 
                             id_autore = " . $id_autore_grep . ", 
                             id_genere = " . $genreId . ", 
                             img_src = '" . $_REQUEST['imageLink'] . "'
                             WHERE isbn = '" . $isbnToBeEdited . "';";
-            
-            echo($edita_libro);
-            
-            // Esecuzione della query di aggiornamento
-            $my_db->query($edita_libro);
-            
-            if ($my_db->affected_rows > 0) {
-                echo "Libro aggiornato con successo.";
-            } else {
-                echo "Errore nell'aggiornamento del libro o nessuna modifica apportata.";
-            }
-        
-            session_write_close();
-            header('Location: books.php');
-            exit();
 
+        echo ($edita_libro);
 
+        // Esecuzione della query di aggiornamento
+        $my_db->query($edita_libro);
+
+        if ($my_db->affected_rows > 0) {
+            echo "Libro aggiornato con successo.";
+        } else {
+            echo "Errore nell'aggiornamento del libro o nessuna modifica apportata.";
         }
 
+        session_write_close();
+        header('Location: books.php');
+        exit();
 
 
-};
+    }
+}
+;
+
+
+if ($_REQUEST["mode"] === 'changeProfilePhoto') {
+
+    if ($_FILES['fotoFile']['size'] < 1) {
+        exit(header('Location: profilo.php?error=fileTooSmall'));
+
+    } else {
+        if ($_FILES['fotoFile']['type'] === 'image/jpeg' || $_FILES['fotoFile']['type'] === 'image/png') {
+            //    print_r($_FILES['fotoFile']);
+            $file_name = $_FILES['fotoFile']['name'];
+            $senza_spazi = preg_replace('/[^A-Za-z0-9.\-_]+/', '', $file_name);
+
+            $target_dir = "http://" . $_SERVER['SERVER_NAME'] . $percorso . '/assets/uploads/';
+            $tutta_dir = $target_dir . $senza_spazi;
+            $upload_dir = 'assets/uploads/' . $senza_spazi;
+            // print $tutta_dir;
+            if (is_uploaded_file($_FILES['fotoFile']["tmp_name"]) && $_FILES['fotoFile']["error"] === UPLOAD_ERR_OK) {
+                if (move_uploaded_file($_FILES['fotoFile']['tmp_name'], $upload_dir)) {
+                    echo "mbare tutto appoggio";
+                    // Preparazione della query SQL
+                    $query_creazione_utente = "UPDATE users SET image_src = '" . $tutta_dir . "' WHERE id = " . $_SESSION['user_id'] . ";";
+                    print_r($query_creazione_utente);
+                    $my_db->query($query_creazione_utente);
+                    $_SESSION["user_image"] = $tutta_dir;
+                    session_write_close();
+                    exit(header('Location: profilo.php'));
+                } else {
+                    echo "vez c'è qualcosa che non va ecco tutta DIR:    ";
+                    print_r("   " . $tutta_dir . "    ");
+                    exit("immagine non caricata");
+                }
+            }
+        } else {
+            echo "qualcosa è andato storto";
+            exit(header('Location: profilo.php?error=fileNotSupported'));
+        }
+        
+    }
+    
+}

@@ -20,10 +20,19 @@ $my_db = new mysqli(
 if ($my_db->connect_error) {
     die($my_db->connect_error);
 } else {
-    $sql = 'CREATE DATABASE IF NOT EXISTS gestione_libreria;';
-    $my_db->query($sql);
 
-    $my_db->query('USE gestione_libreria');
+    $sql = 'CREATE DATABASE IF NOT EXISTS gestione_libreria_mp;';
+    
+    $query = "SHOW DATABASES LIKE 'gestione_libreria_mp'";
+    $result = $my_db->query($query);
+
+    if ($result->num_rows == 0) {
+        $nonEsiste = "ok";
+        
+    }
+    
+    $my_db->query($sql);
+    $my_db->query('USE gestione_libreria_mp');
 
     $creazione_tabella_autori = "CREATE TABLE IF NOT EXISTS autori(
         id INT PRIMARY KEY AUTO_INCREMENT, 
@@ -63,16 +72,37 @@ if ($my_db->connect_error) {
                         (4, 'Mystery'), 
                         (5, 'Thriller')";
 
+
+
     $my_db->query($creazione_tabella_autori);
     $my_db->query($creazione_tabella_generi);
     $my_db->query($creazione_tabella_libri);
     $my_db->query($creazione_tabella_users);
     $my_db->query($creazione_generi);
 
-};
+    if($nonEsiste === "ok") {
+        $insert_user_example = "INSERT INTO users (id, name, username, email, pwd, image_src) VALUES (1, 'Mario Petrella', 'mario', 'mariopet92@gmail.com', '$2y$10$35S24eYCY9VxqWYdNQoOauH2YqwpBqzBuSzQOCl4qy/IVBsJVzstW', 'assets/img/default.png')";
+        $insert_autori_example = "INSERT INTO autori (id, nome) VALUES (1, 'Dario Bressanini'), (2, 'Luigi Pirandello'), (3, 'Luca Boiardi');";
+        $insert_libri_example = "INSERT INTO libri (isbn, titolo, anno_pub, id_autore, id_genere, created_by_user_id, img_src) VALUES 
+        (9788858016022, 'La scienza della carne', 2015, 1, 2, 1, 'https://m.media-amazon.com/images/I/61l7zdi8j9L._SL1194_.jpg'),
+        (9788867582280, 'Uno, nessuno e centomila', 1938, 2, 5, 1, 'https://m.media-amazon.com/images/I/61lME-Io+HL._SL1180_.jpg'),
+        (9788867582310, 'Il fu Mattia Pascal', 1950, 2, 5, 1, 'https://m.media-amazon.com/images/I/71kqovIXGfL._SL1500_.jpg'),
+        (9788836010790, 'Investire in bitcoin e criptovalute', 2022, 3, 2, 2, 'https://m.media-amazon.com/images/I/71p06gHoeiL._SL1500_.jpg');";
+
+        $my_db->query($insert_user_example);
+        $my_db->query($insert_autori_example);
+        $my_db->query($insert_libri_example);
+
+    }
+
+        
+
+}
+;
 
 
-function mysqltoarray($oggetto) {
+function mysqltoarray($oggetto)
+{
     $result = [];
     if ($oggetto) { // Controllo se ci sono dei dati nella variabile $res
         while ($row = $oggetto->fetch_assoc()) { // Trasformo $res in un array associativo
@@ -85,7 +115,8 @@ function mysqltoarray($oggetto) {
 
 
 //funzione per trasformare genere in ID
-function getGenreId($genre) {
+function getGenreId($genre)
+{
     $genreId = null; // Inizializza a null per gestire il caso di default
 
     // Usa switch per mappare il genere al suo ID

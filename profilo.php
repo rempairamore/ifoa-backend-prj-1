@@ -14,9 +14,15 @@ require_once("assets/php/config.php") ?>
         <div class="w-100 mt-5 d-flex justify-content-center">
             <div class="row w-75 d-flex align-items-center">
                 <!-- Colonna Immagine a Sinistra -->
-                <div class="col-md-3">
-                    <img src="<?= $_SESSION['user_image'] ?>" class="img-fluid" alt="Profile Image" style="width: 200px; height: 200px; border-radius: 50%;">
-                </div>
+                <div class="col-md-3 position-relative text-center">
+            <img src="<?= $_SESSION['user_image'] ?>" class="img-fluid" alt="Profile Image" style="width: 200px; height: 200px; border-radius: 50%;">
+            <!-- Inizio form di upload -->
+            <form action="controller.php?mode=changeProfilePhoto" method="POST" enctype="multipart/form-data" class="position-absolute" style="top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                <input id="file-input" type="file" name="fotoFile" accept="image/png, image/jpeg" onchange="this.form.submit()" hidden>
+                <label for="file-input" class="btn btn-sm btnChangeImg">Scegli file</label>
+            </form>
+            <!-- Fine form di upload -->
+        </div>
 
                 <!-- Colonna Dettagli Utente a Destra -->
                 <div class="col-md-9">
