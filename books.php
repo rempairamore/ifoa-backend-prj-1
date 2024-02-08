@@ -2,6 +2,7 @@
 
 <div class="sezioneBooks">
   <?php
+  session_start();
   if ($_SESSION['login'] === 'true') {
     // Leggo dati da una tabella
   
@@ -27,7 +28,7 @@
 
   <div class="row row-cols-1 row-cols-md-4 g-4 mb-5 mt-4 mx-3">
     <?php
-    if (isset($result)) {
+    if (!empty($result)) {
       foreach ($result as $key => $value) { ?>
         <div class="col">
           <div class="card">
@@ -48,12 +49,18 @@
                   Genre: <b> <?= $value['genere'] ?> </b>
                 </small></p>
               <button type="button" class="btn btn-danger" onclick="window.location.href='controller.php?isbn=<?= $value['isbn'] ?>';">Delete Book</button>
+              <button type="button" class="btn btn-warning" onclick="window.location.href='addbook.php?editBook=<?= $value['isbn'] ?>';">Edit</button>
 
             </div>
           </div>
         </div>
         <?php
+        session_write_close();
       }
+    } else {
+      ?>
+        <p>Your library is empty</p>
+      <?php
     }
 
     ?>

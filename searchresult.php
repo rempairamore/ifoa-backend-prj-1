@@ -1,6 +1,13 @@
 <?php require_once("assets/php/header.php");
 require_once("assets/php/navbar.php");
-require_once("assets/php/config.php") ?>
+require_once("assets/php/config.php");
+if(!empty($_POST['userSearch'])) {
+    $searchTerm = '%' . $_POST['userSearch'] . '%'; 
+} else {
+    session_write_close();
+    exit(header('Location: index.php'));
+};
+?>
 
 
 
@@ -12,7 +19,17 @@ require_once("assets/php/config.php") ?>
         if ($_SESSION['login'] === 'true') {
             // Leggo dati da una tabella
         
-            $sql = 'SELECT libri.isbn, libri.titolo, libri.anno_pub, libri.img_src, libri.created_by_user_id, autori.nome, generi.genere  FROM libri  INNER JOIN autori ON libri.id_autore = autori.id  JOIN generi ON libri.id_genere = generi.id  JOIN users ON libri.created_by_user_id = users.id';
+            $sql = "SELECT libri.isbn, libri.titolo, libri.anno_pub, libri.img_src, libri.created_by_user_id, autori.nome AS nome_autore, generi.genere 
+            FROM libri 
+            INNER JOIN autori ON libri.id_autore = autori.id 
+            INNER JOIN generi ON libri.id_genere = generi.id 
+            INNER JOIN users ON libri.created_by_user_id = users.id
+            WHERE libri.titolo LIKE '" . $searchTerm . "' OR autori.nome LIKE '" . $searchTerm . "'";
+
+            // print "". $sql ."";
+            // exit();
+
+
             $result = [];
             $res = $my_db->query($sql); // return un mysqli result
             if ($res) { // Controllo se ci sono dei dati nella variabile $res
@@ -34,7 +51,7 @@ require_once("assets/php/config.php") ?>
 
         <div class="row row-cols-1 row-cols-md-4 g-4 mb-5 mt-4 mx-3">
             <?php
-            if (isset($result)) {
+            if (!empty($result)) {
                 foreach ($result as $key => $value) { ?>
                     <div class="col">
                         <div class="card">
@@ -45,7 +62,7 @@ require_once("assets/php/config.php") ?>
                                     <?= $value['titolo'] ?>
                                 </h5>
                                 <p class="card-text">
-                                    <?= ucfirst(strtolower($value['nome'])) . ", " . $value['anno_pub'] ?>
+                                    <?= ucfirst(strtolower($value['nome_autore'])) . ", " . $value['anno_pub'] ?>
                                 </p>
                                 <p class="card-text" style="font-size: 0.8em; font-weight: 200;">
                                     ISBN:
@@ -58,7 +75,7 @@ require_once("assets/php/config.php") ?>
                                     </small></p>
                                     <p class="card-text" style="font-size: 0.8em; font-weight: 200;">
                                     Added by:
-                                    <a href="userdetail.php?userNameDetail=<?= $value['nome'] ?>"><?= $value['nome'] ?></a>
+                                    <a href="userdetail.php?userNameDetail=<?= $value['nome_autore'] ?>"><?= $value['nome_autore'] ?></a>
                                     
                                 </p>
 
@@ -68,6 +85,11 @@ require_once("assets/php/config.php") ?>
                     <?php
                     session_write_close();
                 }
+            } else {
+                session_write_close();
+                ?>
+                <p class="fs-5 text-danger text-center">No result, try another query!</p>
+                <?php
             }
 
             ?>
