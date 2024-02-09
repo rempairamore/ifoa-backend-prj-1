@@ -85,7 +85,7 @@ if (!empty($_REQUEST['editBook'])) {
     ?>
 
     <div class="container d-flex justify-content-center mt-5">
-        <form class="w-50" method="POST" action="controller.php?mode=editBook">
+        <form class="w-50" method="POST" action="controller.php?mode=newBook">
             <div class="mb-3">
                 <label for="bookTitle" class="form-label">Book Title</label>
                 <input type="text" class="form-control" id="bookTitle" name="bookTitle"

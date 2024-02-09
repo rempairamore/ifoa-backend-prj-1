@@ -53,8 +53,8 @@ session_start();
       <?php
         if($_SESSION['login'] === 'true') {
           ?>
-          <a href="profilo.php"><img src="<?= $_SESSION['user_image'] ?>" style="width: 40px; height: 40px;border-radius: 50%; cursor: pointer;" class="mx-3" alt="immagine profilo"> </a>
-<a class="btn btn-sm btn-danger" href="controller.php?mode=logout" role="button">Log Out</a>
+          <a href="profilo.php"><img src="<?= $_SESSION['user_image'] ?>" style="width: 40px; height: 40px;border-radius: 50%; cursor: pointer;" class="mx-3 mx-3 d-none d-lg-inline" alt="immagine profilo"> </a>
+<a class="btn btn-sm btn-danger my-3 my-lg-0 d-flex justify-content-center" href="controller.php?mode=logout" role="button">Log Out</a>
           <?php
         }
         ?>

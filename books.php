@@ -19,6 +19,7 @@
 
   } else {
     echo "<p class='m-4'>Please consider login (or create a new account).</p>";
+    exit();
   }
   ;
 

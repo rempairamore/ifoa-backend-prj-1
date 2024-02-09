@@ -33,6 +33,7 @@ require_once("assets/php/config.php") ?>
 
         ?>
 
+        <h3 class="text-center">All Books</h3>
         <div class="row row-cols-1 row-cols-md-4 g-4 mb-5 mt-4 mx-3">
             <?php
             if (isset($result)) {
